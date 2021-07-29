@@ -1,176 +1,149 @@
 <h2 class="m-4 text-center">SM Work Order Cost Estimation</h2>
 
 <div class="container">
-  <div class="fee-precentage">
-    <div class="row">
-      <div class="col-5"></div>
-      <label for="fee" class="col text-center">Fee %:</label>
-      <input [(ngModel)]="feePrecentage" (keyup)="keyUp()" name="fee" type="text" class="col form-control" id="fee">
-      <div class="col-5"></div>
-    </div>
-
-    <!--Start first Table-->
-    <table class="mt-5 table table-sm">
-      <thead>
-        <tr>
-          <th scope="col" style="width: 50%;"></th>
-          <th scope="col" style="width: 10%;">Units</th>
-          <th scope="col" style="width: 15%;">Base</th>
-          <th scope="col" style="width: 5%;"></th>
-          <th scope="col" style="width: 20%;">Cost</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let cost of costDetails">
-          <td *ngIf="cost.titleType === 'Label'" scope="row">{{cost.title}}</td>
-          <td *ngIf="cost.titleType === 'Input'" scope="row">
-            <input type="text" autofocus #titleInput [(ngModel)]="cost.title" class="form-control title-input">
-          </td>
-          <td>
-            <input type="text" [(ngModel)]="cost.units" (keyup)="keyUp()" class="form-control">
-          </td>
-          <td>
-            <input [(ngModel)]="cost.base" (keyup)="keyUp()" type="text" class="form-control">
-          </td>
-          <td></td>
-          <td>
-            <input type="text" [value]="getRowTotalCost(cost) | number:'1.2-2'" disabled class="form-control">
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td><button class="btn btn-primary btn-sm" (click)="addNewRow()">Add New</button></td>
-          <th colspan="3" class="text-right">Total Cost</th>
-          <td>
-            <input type="text" [value]="totalCost | number:'1.2-2'" disabled class="form-control">
-          </td>
-        </tr>
-        <tr>
-          <th colspan="4" class="text-right">Total Cost plus Fee</th>
-          <td><input type="text" [value]="totalCostPlusFee | number:'1.2-2'" disabled class="form-control"></td>
-        </tr>
-      </tfoot>
-    </table>
-    <!--End first table-->
-
-    <!--Start second table-->
-    <table class="mt-5 table table-sm">
-      <thead>
-        <tr>
-          <th scope="col" style="width: 50%;">
-            <h5>Revenue Based Allocations</h5>
-          </th>
-          <th scope="col" style="width: 25%;"></th>
-          <th scope="col" style="width: 25%;"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let allocation of revenueAllocations">
-          <td scope="row">{{allocation.title}}</td>
-          <td>
-            <input type="number" [value]="allocation.percentage" disabled class="form-control">
-          </td>
-          <td>
-            <input type="text" [value]="getRowTotalRevenueAllocation(allocation) | number:'1.2-2'" disabled
-              class="form-control">
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <th colspan="2" class="text-right">Revenue Allocations</th>
-          <td>
-            <input type="text" [value]="totalRevenueAllocation | number:'1.2-2'" disabled class="form-control">
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-    <!--End second table-->
-
-    <!--Start third table-->
-    <table class="mt-5 table table-sm">
-      <thead>
-        <tr>
-          <th scope="col" style="width: 50%;">
-            <h5>Labor Based Allocations</h5>
-          </th>
-          <th scope="col" style="width: 25%;"></th>
-          <th scope="col" style="width: 25%;"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let allocation of labourAllocations">
-          <td scope="row">{{allocation.title}}</td>
-          <td>
-            <input type="number" [value]="allocation.percentage" disabled class="form-control">
-          </td>
-          <td>
-            <input type="text" [value]="getRowTotalLabourAllocation(allocation) | number:'1.2-2'" disabled
-              class="form-control">
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <th colspan="2" class="text-right">Labor Allocations</th>
-          <td><input type="text" [value]="totalLabourAllocation | number:'1.2-2'" disabled class="form-control"></td>
-        </tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>
-        <tr style="border-top: none;">
-          <th colspan="2" class="text-right">Total Invoice</th>
-          <td><input type="text" [value]="totalOverall | number:'1.2-2'" disabled class="form-control"></td>
-        </tr>
-      </tfoot>
-    </table>
-    <!--End third table-->
-
+  <!--Start Fee Percentage-->
+  <div class="d-flex justify-content-center">
+    <label for="fee" class="text-end pt-1">Fee %:</label>
+    <input style="width: 100px;" id="fee" [(ngModel)]="feePrecentage" name="fee" type="text"
+      class="form-control no-print-border ml-5" id="fee">
   </div>
+  <!--End Fee Percentage-->
 
-  <!-- <table class="table table-striped">
+  <!--Start first Table-->
+  <table class="mt-5 table table-md">
     <thead>
-      <tr>
-        <th>Code</th>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Action</th>
+      <tr style="text-align: right;">
+        <th scope="col" style="width: 50%;"></th>
+        <th scope="col" style="width: 10%;">Units</th>
+        <th scope="col" style="width: 15%;">Base</th>
+        <th scope="col" style="width: 5%;"></th>
+        <th scope="col" style="width: 20%;">Cost</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let field of fieldArray; let i = index">
-        <td>
-          <input [(ngModel)]="field.code" class="form-control" type="text" name="{{field.code}}" />
+      <tr *ngFor="let cost of costDetails; let i = index;">
+        <td *ngIf="cost.titleType === 'Label'" scope="row">{{cost.title}}</td>
+        <td *ngIf="cost.titleType === 'Input'" scope="row">
+          <input type="text" [(ngModel)]="cost.title" placeholder="Enter New Title" class="form-control title-input">
         </td>
         <td>
-          <input [(ngModel)]="field.name" class="form-control" type="text" name="{{field.name}}" />
+          <input type="text" [(ngModel)]="cost.units" class="form-control no-print-border">
         </td>
         <td>
-          <input [(ngModel)]="field.price" class="form-control" type="text" name="{{field.price}}" />
+          <input type="text" [(ngModel)]="cost.base" class="form-control no-print-border">
         </td>
+        <td></td>
         <td>
-          <button class="btn btn-default" type="button" (click)="deleteFieldValue(i)">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <input class="form-control" type="text" id="newAttributeCode" [(ngModel)]="newAttribute.code"
-            name="newAttributeCode" />
-        </td>
-        <td>
-          <input class="form-control" type="text" id="newAttributeName" [(ngModel)]="newAttribute.name"
-            name="newAttributeName" />
-        </td>
-        <td>
-          <input class="form-control" type="text" id="newAttributePrice" [(ngModel)]="newAttribute.price"
-            name="newAttributePrice" />
-        </td>
-        <td>
-          <button class="btn btn-default" type="button" (click)="addFieldValue()">Add</button>
+          <input type="text" [value]="(cost.base * cost.units) | number: '1.2-2'" disabled
+            class="form-control no-print-border">
         </td>
       </tr>
     </tbody>
-  </table> -->
+    <tfoot>
+      <tr>
+        <td>
+          <button class="btn btn-primary btn-sm no-print" (click)="addNewRow()">Add New</button>
+        </td>
+        <th colspan="3" class="text-right">Total Cost</th>
+        <td>
+          <input type="text" [value]="calcTotalCost() | number:'1.2-2'" disabled class="form-control no-print-border">
+        </td>
+      </tr>
+      <tr>
+        <th colspan="4" class="text-right">Total Cost plus Fee</th>
+        <td>
+          <input type="text" [value]="calcTotalCostWithPercentage() | number:'1.2-2'" disabled
+            class="form-control no-print-border">
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+  <!--End first table-->
+
+  <!--Start second table-->
+  <table class="mt-5 table table-md">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 50%;">
+          <h5>Revenue Based Allocations</h5>
+        </th>
+        <th scope="col" style="width: 25%;"></th>
+        <th scope="col" style="width: 25%;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let allocation of revenueAllocations">
+        <td scope="row">{{allocation.title}}</td>
+        <td>
+          <input type="number" [value]="allocation.percentage" disabled class="form-control no-print-border">
+        </td>
+        <td>
+          <input type="text" [value]="totalCostWithFee * allocation.percentage | number:'1.2-2'" disabled
+            class="form-control no-print-border">
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="2" class="text-right">Revenue Allocations</th>
+        <td>
+          <input type="text" [value]="calcTotalRevenueAllocation() | number:'1.2-2'" disabled
+            class="form-control no-print-border">
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+  <!--End second table-->
+
+  <!--Start third table-->
+  <table class="mt-5 table table-md">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 50%;">
+          <h5>Labor Based Allocations</h5>
+        </th>
+        <th scope="col" style="width: 25%;"></th>
+        <th scope="col" style="width: 25%;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let allocation of labourAllocations">
+        <td scope="row">{{allocation.title}}</td>
+        <td>
+          <input type="number" [value]="allocation.percentage" disabled class="form-control no-print-border">
+        </td>
+        <td>
+          <input type="text"
+            [value]="costDetails[0].units * costDetails[0].base * allocation.percentage | number:'1.2-2'" disabled
+            class="form-control no-print-border">
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="2" class="text-right">Labor Allocations</th>
+        <td>
+          <input type="text" [value]="calcTotalLaborAllocation() | number:'1.2-2'" disabled
+            class="form-control no-print-border">
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+      </tr>
+      <tr style="border-top: none;">
+        <th colspan="2" class="text-right">Total Invoice</th>
+        <td>
+          <input type="text" [value]="calcOverallTotal() | number:'1.2-2'" disabled
+            class="form-control no-print-border">
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+  <!--End third table-->
+
+  <!--Start Print-->
+  <div class="d-flex justify-content-center m-5">
+    <button (click)="printForm()" class="btn btn-primary no-print">Print Report</button>
+  </div>
+  <!--End Print-->
 </div>
